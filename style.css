@@ -232,12 +232,15 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 6vw, 4.2rem);
+  font-size: clamp(1.8rem, 6vw, 4.2rem);
   color: var(--white);
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.2;
   text-shadow: 0 4px 30px rgba(0,0,0,0.4);
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
+  max-width: 100%;
+  padding: 0 1rem;
 }
 .hero-subtitle {
   color: rgba(255,255,255,0.65);
@@ -829,6 +832,43 @@ model-viewer {
   height: 100%;
   --poster-color: transparent;
 }
+
+/* 3D Loading Progress */
+.progress-bar {
+  display: block;
+  width: 60%;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 10px;
+  overflow: visible;
+  z-index: 100;
+}
+.update-bar {
+  background: var(--gold);
+  width: 0%;
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+.progress-text {
+  position: absolute;
+  top: -24px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.hide {
+  display: none !important;
+}
 .prod-info-box {
   width: 55%;
   background: #faf8f5;
@@ -906,9 +946,11 @@ model-viewer {
 }
 .prod-action-area {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   margin-top: auto;
+  flex-wrap: wrap;
 }
 .prod-price-box {
   display: flex;
@@ -1334,7 +1376,12 @@ model-viewer {
     background: rgba(255,255,255,0.05);
     border-radius: 8px;
   }
-  .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .about-grid { grid-template-columns: 1fr; gap: 2.5rem; text-align: center; }
+  .about-visual { display: flex; justify-content: center; width: 100%; }
+  .about-card { width: 280px; height: 280px; } /* Smaller on mobile */
+  .about-title { text-align: center; }
+  .about-body { text-align: center; }
+  .about-actions { display: flex; justify-content: center; }
   .catalog-grid { grid-template-columns: repeat(2, 1fr); }
   
   .item-img {
@@ -1426,6 +1473,34 @@ model-viewer {
   .modal-panel {
     border-radius: 16px;
   }
+  /* Text alignment - center for mobile */
+  .section-title,
+  .section-sub,
+  .section-eyebrow,
+  .section-header {
+    text-align: center;
+  }
+  .item-info { text-align: center; }
+  .hero-content { padding: 1rem; }
+  .hero-title { font-size: clamp(1.6rem, 7vw, 2.4rem); }
+
+  /* Product modal action area stack vertically on mobile */
+  .prod-action-area {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .prod-price-box { align-items: center; }
+  .btn-beli-elegant { width: 100%; justify-content: center; }
+
+  /* Footer center on mobile */
+  .footer-flex {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+    align-items: center;
+  }
+  .footer-right { align-items: center; }
 }
 @media (max-width: 540px) {
   .motif-grid { grid-template-columns: 1fr 1fr; }
