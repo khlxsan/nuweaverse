@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — Nuweav</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="../assets/bunga1.png">
+</head>
+<body>
+
+  <!-- NAVBAR SIMPLE -->
+  <nav class="checkout-nav">
+    <div class="container">
+      <a href="../index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Kembali ke Katalog
+      </a>
+      <span class="nav-logo">NUWEAV</span>
+    </div>
+  </nav>
+
+  <main class="checkout-main">
+    <div class="container checkout-grid">
+      
+      <!-- KIRI: Rincian Produk & Pembayaran -->
+      <div class="checkout-left">
+        <h1 class="page-title">Selesaikan Pesanan</h1>
+        
+        <div class="card order-summary">
+          <h2 class="card-title">Ringkasan Pesanan</h2>
+          <div class="order-item">
+            <div class="item-img">
+              <img src="../assets/bajurok.png" alt="Sasmita Nusantara">
+            </div>
+            <div class="item-details">
+              <h3 class="item-name">Sasmita Nusantara</h3>
+              <p class="item-desc">Batik Tulis Sutra Alam (Pre-Order 14 Hari)</p>
+            </div>
+          </div>
+          <div class="order-total">
+            <span>Total Harga</span>
+            <span class="total-price">Rp1.050.000</span>
+          </div>
+        </div>
+
+        <div class="card payment-info">
+          <h2 class="card-title">Instruksi Pembayaran</h2>
+          <p class="payment-desc">Silakan lakukan transfer sebesar <strong>Rp1.050.000</strong> ke rekening berikut sebelum mengonfirmasi pesanan:</p>
+          
+          <div class="bank-card">
+            <div class="bank-logo">BPD DIY</div>
+            <div class="bank-details">
+              <p class="acc-number" id="accNumber">041.262.002895</p>
+              <p class="acc-name">a.n CHIARA JAUZAA NUGRAHA</p>
+            </div>
+            <button type="button" class="btn-copy" id="btnCopy" aria-label="Salin nomor rekening">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </button>
+          </div>
+          <p class="payment-note">* Simpan bukti transfer Anda untuk dikirimkan melalui WhatsApp.</p>
+        </div>
+      </div>
+
+      <!-- KANAN: Form Pengisian Data -->
+      <div class="checkout-right">
+        <div class="card form-card">
+          <h2 class="card-title">Informasi Pengiriman</h2>
+          <form id="checkoutForm">
+            
+            <div class="form-group">
+              <label for="nama">Nama Lengkap *</label>
+              <input type="text" id="nama" name="nama" required placeholder="Masukkan nama lengkap">
+            </div>
+
+            <div class="form-group">
+              <label for="whatsapp">Nomor WhatsApp *</label>
+              <input type="tel" id="whatsapp" name="whatsapp" required placeholder="Contoh: 08123456789">
+            </div>
+
+            <div class="form-group">
+              <label for="alamat">Alamat Lengkap Pengiriman *</label>
+              <textarea id="alamat" name="alamat" rows="4" required placeholder="Jalan, RT/RW, Kelurahan, Kecamatan, Kota, Kode Pos"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="catatan">Catatan Tambahan (Opsional)</label>
+              <textarea id="catatan" name="catatan" rows="2" placeholder="Catatan ukuran, patokan alamat, dll."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">
+              Konfirmasi & Kirim Bukti via WA
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
