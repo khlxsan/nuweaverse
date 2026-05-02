@@ -9,6 +9,39 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="../assets/bunga1.png">
+  <!-- ✦ Auth Guard: redirect ke /login/ jika belum login ✦ -->
+  <!-- Firebase SDK for Auth Guard -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAuU5g5_hVvSGzl7OOhtG_zGcRrdxh0EXo",
+      authDomain: "nusantaraweaveverse-cbdf2.firebaseapp.com",
+      projectId: "nusantaraweaveverse-cbdf2",
+      storageBucket: "nusantaraweaveverse-cbdf2.firebasestorage.app",
+      messagingSenderId: "304336105559",
+      appId: "1:304336105559:web:018ed8ab9d79924f83f312"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+      const session = JSON.parse(localStorage.getItem('nuweav_session') || 'null');
+      
+      // Jika belum login, lempar ke login
+      if (!user && !session) {
+        window.location.replace('../login/');
+        return;
+      }
+
+      // Jika admin mencoba masuk ke checkout, lempar ke dasbor admin
+      if (session && session.role === 'admin') {
+        window.location.replace('../admin/');
+      }
+    });
+  </script>
 </head>
 <body>
 
@@ -102,6 +135,149 @@
     </div>
   </main>
 
+  <!-- Modal Konfirmasi Pembelian -->
+  <div class="modal-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-box">
+      <div class="modal-icon">🛍️</div>
+      <h2 class="modal-title" id="confirmTitle">Konfirmasi Pesanan</h2>
+      <p class="modal-desc">Apakah Anda sudah mentransfer pembayaran dan ingin mengkonfirmasi pesanan Anda?</p>
+      <div class="modal-summary" id="modalSummary"></div>
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" id="btnModalCancel">Cek Ulang</button>
+        <button class="btn-modal-confirm" id="btnModalConfirm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>
+          Ya, Lanjutkan ke WA
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script src="script.js"></script>
+
+  <!-- Firebase SDK for Orders -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAuU5g5_hVvSGzl7OOhtG_zGcRrdxh0EXo",
+      authDomain: "nusantaraweaveverse-cbdf2.firebaseapp.com",
+      projectId: "nusantaraweaveverse-cbdf2",
+      storageBucket: "nusantaraweaveverse-cbdf2.firebasestorage.app",
+      messagingSenderId: "304336105559",
+      appId: "1:304336105559:web:018ed8ab9d79924f83f312"
+    };
+
+    const app = initializeApp(firebaseConfig, 'checkout-orders');
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ── Isi nama user dari sesi & handle logout ──
+    (function() {
+      var raw = localStorage.getItem('nuweav_session');
+      if (!raw) return;
+      var user = JSON.parse(raw);
+      // Pre-fill nama di form
+      var namaInput = document.getElementById('nama');
+      if (namaInput && user.nama) namaInput.value = user.nama;
+    })();
+
+    // ── Modal & Form Logic ──
+    const checkoutForm = document.getElementById('checkoutForm');
+    const confirmModal = document.getElementById('confirmModal');
+    const btnModalCancel = document.getElementById('btnModalCancel');
+    const btnModalConfirm = document.getElementById('btnModalConfirm');
+    const modalSummary = document.getElementById('modalSummary');
+
+    // Simpan data WA URL sementara saat modal terbuka
+    let pendingWaURL = '';
+    let pendingOrderData = {};
+
+    checkoutForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const nama = document.getElementById('nama').value.trim();
+      const whatsapp = document.getElementById('whatsapp').value.trim();
+      const alamat = document.getElementById('alamat').value.trim();
+      const catatan = document.getElementById('catatan').value.trim();
+
+      const productName = "Sasmita Nusantara";
+      const productPrice = "Rp1.050.000";
+      const adminWA = "6281339499293";
+
+      // Susun pesan WhatsApp
+      let message = `Halo Nuweav, saya ingin memesan produk berikut:%0A%0A`;
+      message += `*Detail Pesanan:*%0A`;
+      message += `- Produk: ${productName}%0A`;
+      message += `- Harga: ${productPrice}%0A%0A`;
+      message += `*Data Pengiriman:*%0A`;
+      message += `- Nama: ${nama}%0A`;
+      message += `- No. WA: ${whatsapp}%0A`;
+      message += `- Alamat: ${alamat}%0A`;
+      if (catatan) message += `- Catatan: ${catatan}%0A`;
+      message += `%0A---------------------------%0A`;
+      message += `Saya akan segera melakukan transfer ke rekening BPD DIY (041.262.002895) dan mengirimkan bukti transfernya di obrolan ini. Terima kasih.`;
+
+      pendingWaURL = `https://wa.me/${adminWA}?text=${message}`;
+      pendingOrderData = { nama, whatsapp, alamat, catatan, produk: productName, harga: productPrice };
+
+      // Tampilkan ringkasan di modal
+      modalSummary.innerHTML = `
+        <div class="summary-row"><span>Produk</span><strong>${productName}</strong></div>
+        <div class="summary-row"><span>Harga</span><strong>${productPrice}</strong></div>
+        <div class="summary-row"><span>Nama</span><strong>${nama}</strong></div>
+        <div class="summary-row"><span>No. WA</span><strong>${whatsapp}</strong></div>
+        <div class="summary-row"><span>Alamat</span><strong>${alamat}</strong></div>
+        ${catatan ? `<div class="summary-row"><span>Catatan</span><strong>${catatan}</strong></div>` : ''}
+      `;
+
+      // Tampilkan modal
+      confirmModal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+
+    // Tombol batalkan
+    btnModalCancel.addEventListener('click', () => {
+      confirmModal.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+
+    // Tombol konfirmasi — simpan ke Firestore lalu buka WA
+    btnModalConfirm.addEventListener('click', async () => {
+      btnModalConfirm.disabled = true;
+      btnModalConfirm.textContent = 'Menyimpan...';
+
+      const session = JSON.parse(localStorage.getItem('nuweav_session') || '{}');
+      const userId = auth.currentUser ? auth.currentUser.uid : null;
+
+      try {
+        await addDoc(collection(db, 'orders'), {
+          ...pendingOrderData,
+          userId: userId || 'guest',
+          userEmail: session.email || '-',
+          status: 'pending',
+          tanggal: new Date().toISOString(),
+          createdAt: new Date().toLocaleString('id-ID')
+        });
+        console.log('✓ Pesanan berhasil disimpan ke Firestore.');
+      } catch (err) {
+        console.warn('Firestore Error (Pesanan tetap diteruskan ke WA):', err);
+      }
+
+      // Tutup modal & buka WA
+      confirmModal.classList.remove('open');
+      document.body.style.overflow = '';
+      window.open(pendingWaURL, '_blank');
+    });
+
+    // Tutup modal dengan klik di luar
+    confirmModal.addEventListener('click', (e) => {
+      if (e.target === confirmModal) {
+        confirmModal.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
+  </script>
 </body>
 </html>

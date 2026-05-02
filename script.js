@@ -316,4 +316,91 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // ══════════════════════════════════════
+  // AUTH STATE — Navbar & Checkout Guard
+  // ══════════════════════════════════════
+  const navAuth = document.getElementById('navAuth');
+
+  function renderNavAuth() {
+    if (!navAuth) return;
+    const raw = localStorage.getItem('nuweav_session');
+
+    if (raw) {
+      // User sudah login — tampilkan nama + dropdown logout
+      const user = JSON.parse(raw);
+      const firstName = (user.nama || 'Pengguna').split(' ')[0];
+      navAuth.innerHTML = `
+        <div class="nav-user-wrap" id="navUserWrap">
+          <button class="nav-user-btn" id="navUserBtn" aria-haspopup="true" aria-expanded="false">
+            <span class="nav-user-avatar">${firstName.charAt(0).toUpperCase()}</span>
+            <span class="nav-user-name">${firstName}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="nav-user-dropdown" id="navUserDropdown">
+            <div class="nav-dd-info">
+              <span class="nav-dd-nama">${user.nama}</span>
+              <span class="nav-dd-email">${user.email}</span>
+            </div>
+            <div class="nav-dd-divider"></div>
+            <button class="nav-dd-logout" id="navLogout">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Keluar
+            </button>
+          </div>
+        </div>
+      `;
+
+      // Toggle dropdown
+      const userBtn = document.getElementById('navUserBtn');
+      const dropdown = document.getElementById('navUserDropdown');
+      userBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = dropdown.classList.toggle('open');
+        userBtn.setAttribute('aria-expanded', isOpen);
+      });
+      document.addEventListener('click', () => {
+        dropdown.classList.remove('open');
+        userBtn.setAttribute('aria-expanded', 'false');
+      });
+
+      // Logout
+      document.getElementById('navLogout').addEventListener('click', () => {
+        localStorage.removeItem('nuweav_session');
+        window.location.href = 'login/?action=logout';
+      });
+
+    } else {
+      // Belum login — tampilkan tombol Masuk
+      navAuth.innerHTML = `
+        <a href="login/" class="nav-login-btn" id="navLoginBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Masuk
+        </a>
+      `;
+    }
+  }
+
+  renderNavAuth();
+
+  // ── Guard tombol "Pesan" → cek login sebelum ke checkout ──
+  const btnBeli = document.querySelector('.btn-beli-elegant');
+  if (btnBeli) {
+    btnBeli.addEventListener('click', (e) => {
+      const isLoggedIn = !!localStorage.getItem('nuweav_session');
+      if (!isLoggedIn) {
+        e.preventDefault();
+        window.location.href = 'login/?tab=masuk&redirect=checkout';
+      }
+      // Jika sudah login, href bawaan (checkout/) berjalan normal
+    });
+  }
+
 });
+

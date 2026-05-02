@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Masuk / Daftar - Nusantara Weaveverse</title>
+  <meta name="description" content="Masuk atau daftar akun Nuweav untuk melanjutkan pesanan batik eksklusif Anda." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="../assets/bunga1.png" />
+  <meta name="google-signin-client_id" content="304336105559-rnj3tsasci2aotkc1a3nofo2a9832l25.apps.googleusercontent.com">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="auth-nav">
+    <div class="auth-nav-inner">
+      <a href="../" class="auth-back-link" id="authBackLink">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Kembali ke Nuweav
+      </a>
+      <span class="auth-nav-brand">NUWEAV</span>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="auth-main">
+
+    <!-- Decorative Background -->
+    <div class="auth-bg">
+      <div class="auth-orb auth-orb-1"></div>
+      <div class="auth-orb auth-orb-2"></div>
+      <div class="auth-orb auth-orb-3"></div>
+      <div class="auth-pattern"></div>
+    </div>
+
+    <!-- LEFT SIDE: Branding -->
+    <div class="auth-left">
+      <div class="auth-brand-block">
+        <img src="../assets/bunga1.png" alt="Nuweav emblem" class="auth-emblem" />
+        <h1 class="auth-brand-title">Nusantara<br /><em>Weaveverse</em></h1>
+        <p class="auth-brand-desc">Warisan budaya yang luhur,<br />kini hadir di genggaman Anda.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: Auth Card -->
+    <div class="auth-right">
+      <div class="auth-card" id="authCard">
+
+        <!-- Header -->
+        <div class="auth-card-header">
+          <p class="auth-eyebrow" id="authEyebrow">Selamat Datang Kembali</p>
+          <h2 class="auth-card-title" id="authCardTitle">Masuk ke Akun Anda</h2>
+        </div>
+
+        <!-- Tab Toggle -->
+        <div class="auth-tabs" role="tablist">
+          <button class="auth-tab active" id="tabMasuk" role="tab" aria-selected="true" aria-controls="formMasuk">
+            Masuk
+          </button>
+          <button class="auth-tab" id="tabDaftar" role="tab" aria-selected="false" aria-controls="formDaftar">
+            Daftar
+          </button>
+          <div class="auth-tab-indicator" id="tabIndicator"></div>
+        </div>
+
+        <!-- Alert Message -->
+        <div class="auth-alert" id="authAlert" role="alert" aria-live="polite"></div>
+
+        <!-- FORM MASUK -->
+        <form class="auth-form active" id="formMasuk" novalidate>
+          <div class="form-group">
+            <label for="loginEmail" class="form-label">Email</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <input type="email" id="loginEmail" name="email" class="form-input" placeholder="email@contoh.com" autocomplete="email" required />
+            </div>
+            <span class="field-error" id="loginEmailErr"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword" class="form-label">Password</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <input type="password" id="loginPassword" name="password" class="form-input" placeholder="Masukkan password" autocomplete="current-password" required />
+              <button type="button" class="btn-eye" id="toggleLoginPass" aria-label="Tampilkan password">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+            <span class="field-error" id="loginPasswordErr"></span>
+          </div>
+
+          <button type="submit" class="btn-auth" id="btnMasuk">
+            <span class="btn-auth-text">Masuk Sekarang</span>
+            <span class="btn-auth-loader" aria-hidden="true"></span>
+          </button>
+
+          <div class="auth-divider"><span>atau</span></div>
+          
+          <button type="button" class="btn-google" id="btnGoogleMasuk">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Logo" width="20" height="20">
+            Masuk dengan Google
+          </button>
+
+          <p class="auth-switch">
+            Belum punya akun?
+            <button type="button" class="auth-switch-link" id="switchToDaftar">Daftar di sini</button>
+          </p>
+        </form>
+
+        <!-- FORM DAFTAR -->
+        <form class="auth-form" id="formDaftar" novalidate>
+          <div class="form-group">
+            <label for="regNama" class="form-label">Nama Lengkap</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <input type="text" id="regNama" name="nama" class="form-input" placeholder="Nama lengkap Anda" autocomplete="name" required />
+            </div>
+            <span class="field-error" id="regNamaErr"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="regEmail" class="form-label">Email</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <input type="email" id="regEmail" name="email" class="form-input" placeholder="email@contoh.com" autocomplete="email" required />
+            </div>
+            <span class="field-error" id="regEmailErr"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="regPassword" class="form-label">Password</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <input type="password" id="regPassword" name="password" class="form-input" placeholder="Min. 6 karakter" autocomplete="new-password" required />
+              <button type="button" class="btn-eye" id="toggleRegPass" aria-label="Tampilkan password">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+            <span class="field-error" id="regPasswordErr"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="regPasswordConfirm" class="form-label">Ketik Ulang Password</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <input type="password" id="regPasswordConfirm" name="passwordConfirm" class="form-input" placeholder="Ketik ulang password" autocomplete="new-password" required />
+              <button type="button" class="btn-eye" id="toggleRegPassConfirm" aria-label="Tampilkan password">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+            <span class="field-error" id="regPasswordConfirmErr"></span>
+          </div>
+
+          <button type="submit" class="btn-auth" id="btnDaftar">
+            <span class="btn-auth-text">Buat Akun Sekarang</span>
+            <span class="btn-auth-loader" aria-hidden="true"></span>
+          </button>
+
+          <div class="auth-divider"><span>atau</span></div>
+          
+          <button type="button" class="btn-google" id="btnGoogleDaftar">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Logo" width="20" height="20">
+            Daftar dengan Google
+          </button>
+          <p class="auth-switch">
+            Sudah punya akun?
+            <button type="button" class="auth-switch-link" id="switchToMasuk">Masuk di sini</button>
+          </p>
+        </form>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+    // PASTE YOUR FIREBASE CONFIG HERE
+    const firebaseConfig = {
+      apiKey: "AIzaSyAuU5g5_hVvSGzl7OOhtG_zGcRrdxh0EXo",
+      authDomain: "nusantaraweaveverse-cbdf2.firebaseapp.com",
+      projectId: "nusantaraweaveverse-cbdf2",
+      storageBucket: "nusantaraweaveverse-cbdf2.firebasestorage.app",
+      messagingSenderId: "304336105559",
+      appId: "1:304336105559:web:018ed8ab9d79924f83f312",
+      measurementId: "G-Z3X0YW09XC"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    window.fbAuth = getAuth(app);
+    window.fbDb = getFirestore(app);
+  </script>
+
+  <script src="script.js" type="module"></script>
+</body>
+</html>

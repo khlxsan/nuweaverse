@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Nusantara Weaveverse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="../assets/bunga1.png">
+</head>
+
+<body>
+
+  <!-- NAVBAR SIMPLE ADMIN -->
+  <nav class="admin-nav">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <a >Nuweav <span class="admin-badge">Admin</span></a>
+      </div>
+      <div class="nav-right">
+        <span class="admin-email" id="adminEmail">—</span>
+        <button class="btn-logout" id="btnLogout">Keluar</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <h1>Dashboard Admin</h1>
+      <p>Kelola data pengguna dan pesanan Nusantara Weaveverse.</p>
+    </header>
+
+    <!-- TAB NAV -->
+    <div class="admin-tabs">
+      <button class="tab-btn active" data-target="panel-users">Data Pengguna</button>
+      <button class="tab-btn" data-target="panel-orders">Data Penjualan</button>
+    </div>
+
+    <!-- PANEL USERS -->
+    <section id="panel-users" class="admin-panel active">
+      <div class="panel-header">
+        <h2>Daftar Pengguna Terdaftar</h2>
+        <button class="btn-refresh" id="btnRefreshUsers">↻ Muat Ulang</button>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama Lengkap</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Tanggal Daftar</th>
+            </tr>
+          </thead>
+          <tbody id="usersTbody">
+            <tr>
+              <td colspan="5" class="empty-msg loading-msg">Memuat data...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PANEL ORDERS -->
+    <section id="panel-orders" class="admin-panel">
+      <div class="panel-header">
+        <h2>Daftar Pesanan (Checkout)</h2>
+        <button class="btn-refresh" id="btnRefreshOrders">↻ Muat Ulang</button>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Nama Pembeli</th>
+              <th>Email</th>
+              <th>WhatsApp</th>
+              <th>Alamat</th>
+              <th>Produk</th>
+              <th>Harga</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTbody">
+            <tr>
+              <td colspan="8" class="empty-msg loading-msg">Memuat data...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+
+  <!-- Firebase SDK & Admin Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, orderBy, query, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAuU5g5_hVvSGzl7OOhtG_zGcRrdxh0EXo",
+      authDomain: "nusantaraweaveverse-cbdf2.firebaseapp.com",
+      projectId: "nusantaraweaveverse-cbdf2",
+      storageBucket: "nusantaraweaveverse-cbdf2.firebasestorage.app",
+      messagingSenderId: "304336105559",
+      appId: "1:304336105559:web:018ed8ab9d79924f83f312"
+    };
+
+    const app = initializeApp(firebaseConfig, 'admin-app');
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ── Auth Guard: hanya admin yang boleh masuk ──
+    onAuthStateChanged(auth, async (user) => {
+      // 1. Jika tidak ada user Firebase, langsung cek localStorage
+      const session = JSON.parse(localStorage.getItem('nuweav_session') || 'null');
+
+      if (!user) {
+        // Jika di localStorage juga tidak ada atau bukan admin, usir ke login
+        if (!session || session.role !== 'admin') {
+          console.log("Akses ditolak: Sesi tidak ditemukan.");
+          window.location.replace('../login/');
+          return;
+        }
+      }
+
+      // 2. Jika ada user Firebase, verifikasi ulang role-nya di Firestore (Keamanan Ganda)
+      if (user) {
+        try {
+          const { getDoc, doc } = await import("https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js");
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          const userData = userDoc.exists() ? userDoc.data() : {};
+
+          if (userData.role !== 'admin') {
+            console.warn("Akses ditolak: User bukan admin.");
+            localStorage.removeItem('nuweav_session');
+            await signOut(auth);
+            window.location.replace('../login/');
+            return;
+          }
+          
+          // Tampilkan email admin
+          const emailEl = document.getElementById('adminEmail');
+          if (emailEl) emailEl.textContent = user.email;
+          
+          // Sync localStorage jika role sudah diverifikasi
+          localStorage.setItem('nuweav_session', JSON.stringify({
+            nama: userData.nama || user.email.split('@')[0],
+            email: user.email,
+            role: 'admin'
+          }));
+        } catch (e) {
+          console.error('Gagal verifikasi role:', e);
+          // Jika gagal verifikasi database (misal: offline), 
+          // tetap izinkan hanya jika localStorage valid (fallback sementara)
+          if (!session || session.role !== 'admin') {
+            window.location.replace('../login/');
+            return;
+          }
+        }
+      }
+
+      // Muat data jika lolos seleksi
+      loadUsers();
+      loadOrders();
+    });
+
+    // ── Logout: Langsung Akhiri Sesi & Kembali ke Home ──
+    document.getElementById('btnLogout').addEventListener('click', async () => {
+      if (confirm('Apakah Anda yakin ingin keluar?')) {
+        // Bersihkan localStorage agar instan
+        localStorage.clear(); 
+        
+        try {
+          await signOut(auth);
+        } catch (err) {
+          console.error("Firebase Signout Error:", err);
+        }
+        
+        // Langsung lempar ke halaman utama (Home)
+        window.location.replace('../');
+      }
+    });
+
+    // ── Load Data Users dari Firestore ──
+    async function loadUsers() {
+      const tbody = document.getElementById('usersTbody');
+      tbody.innerHTML = `<tr><td colspan="5" class="empty-msg loading-msg">⏳ Memuat data pengguna...</td></tr>`;
+      try {
+        const q = query(collection(db, 'users'), orderBy('createdAt', 'asc'));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          tbody.innerHTML = `<tr><td colspan="5" class="empty-msg">Belum ada pengguna terdaftar.</td></tr>`;
+          return;
+        }
+
+        let html = '';
+        let i = 1;
+        snapshot.forEach(docSnap => {
+          const u = docSnap.data();
+          const tgl = u.createdAt ? new Date(u.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+          const roleBadge = u.role === 'admin'
+            ? `<span class="badge badge-admin">Admin</span>`
+            : `<span class="badge badge-user">User</span>`;
+          html += `<tr>
+            <td>${i++}</td>
+            <td>${u.nama || '-'}</td>
+            <td>${u.email || '-'}</td>
+            <td>${roleBadge}</td>
+            <td>${tgl}</td>
+          </tr>`;
+        });
+        tbody.innerHTML = html;
+      } catch (err) {
+        console.error('Error memuat pengguna:', err);
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-msg">⚠️ Gagal memuat data. Periksa Firestore Rules.</td></tr>`;
+      }
+    }
+
+    // ── Load Data Orders dari Firestore ──
+    async function loadOrders() {
+      const tbody = document.getElementById('ordersTbody');
+      tbody.innerHTML = `<tr><td colspan="8" class="empty-msg loading-msg">⏳ Memuat data pesanan...</td></tr>`;
+      try {
+        const q = query(collection(db, 'orders'), orderBy('tanggal', 'desc'));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          tbody.innerHTML = `<tr><td colspan="8" class="empty-msg">Belum ada data penjualan.</td></tr>`;
+          return;
+        }
+
+        let html = '';
+        snapshot.forEach(docSnap => {
+          const o = docSnap.data();
+          const orderId = docSnap.id;
+          const tgl = o.tanggal ? new Date(o.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : (o.createdAt || '-');
+
+          let statusClass = 'badge-pending';
+          if (o.status === 'selesai') statusClass = 'badge-done';
+          if (o.status === 'cancel') statusClass = 'badge-cancel';
+
+          html += `<tr>
+            <td>${tgl}</td>
+            <td>${o.nama || '-'}</td>
+            <td>${o.userEmail || '-'}</td>
+            <td>${o.whatsapp || '-'}</td>
+            <td class="td-alamat">${o.alamat || '-'}</td>
+            <td>${o.produk || '-'}</td>
+            <td><strong>${o.harga || '-'}</strong></td>
+            <td>
+              <div class="status-wrapper">
+                <span class="badge ${statusClass} badge-clickable" onclick="window.toggleStatusMenu('${orderId}')">
+                  ${o.status || 'pending'}
+                  <svg class="icon-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </span>
+                <div class="status-menu" id="menu-${orderId}">
+                  <div class="status-option" onclick="window.updateStatus('${orderId}', 'pending')">Pending</div>
+                  <div class="status-option" onclick="window.updateStatus('${orderId}', 'selesai')">Selesai</div>
+                  <div class="status-option" onclick="window.updateStatus('${orderId}', 'cancel')">Cancel</div>
+                </div>
+              </div>
+            </td>
+          </tr>`;
+        });
+        tbody.innerHTML = html;
+      } catch (err) {
+        console.error('Error memuat pesanan:', err);
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-msg">⚠️ Gagal memuat data. Periksa Firestore Rules.</td></tr>`;
+      }
+    }
+
+    // ── Toggle Status Menu ──
+    window.toggleStatusMenu = (orderId) => {
+      const allWrappers = document.querySelectorAll('.status-wrapper');
+      const targetMenu = document.getElementById(`menu-${orderId}`);
+      const targetWrapper = targetMenu ? targetMenu.closest('.status-wrapper') : null;
+
+      // Tutup semua yang lain
+      allWrappers.forEach(w => {
+        if (w !== targetWrapper) {
+          w.classList.remove('open');
+          const m = w.querySelector('.status-menu');
+          if (m) m.classList.remove('open');
+        }
+      });
+
+      // Toggle yang diklik
+      if (targetWrapper && targetMenu) {
+        targetWrapper.classList.toggle('open');
+        targetMenu.classList.toggle('open');
+      }
+    };
+
+    // ── Update Order Status ──
+    window.updateStatus = async (orderId, newStatus) => {
+      try {
+        const orderRef = doc(db, 'orders', orderId);
+        await updateDoc(orderRef, { status: newStatus });
+        loadOrders(); // Refresh table
+      } catch (err) {
+        console.error('Error updating status:', err);
+        alert('⚠️ Gagal memperbarui status.');
+      }
+    };
+
+    // Tutup menu jika klik di luar
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.status-wrapper')) {
+        document.querySelectorAll('.status-wrapper').forEach(w => w.classList.remove('open'));
+        document.querySelectorAll('.status-menu').forEach(m => m.classList.remove('open'));
+      }
+    });
+
+    // ── Tombol Refresh ──
+    document.getElementById('btnRefreshUsers').addEventListener('click', loadUsers);
+    document.getElementById('btnRefreshOrders').addEventListener('click', loadOrders);
+
+  </script>
+</body>
+
+</html>
