@@ -265,11 +265,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Navbar Scroll Effect ──
   const nav = document.getElementById('navbar');
+  const logo = document.querySelector('.nav-logo');
+  
   if (nav) {
     window.addEventListener('scroll', () => {
       if (window.scrollY > 50) nav.classList.add('scrolled');
       else nav.classList.remove('scrolled');
     }, { passive: true });
+  }
+
+  if (logo) {
+    logo.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   }
 
   // ── Hamburger Menu Toggle ──

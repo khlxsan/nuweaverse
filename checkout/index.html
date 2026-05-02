@@ -9,38 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="../assets/bunga1.png">
-  <!-- ✦ Auth Guard: redirect ke /login/ jika belum login ✦ -->
-  <!-- Firebase SDK for Auth Guard -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAuU5g5_hVvSGzl7OOhtG_zGcRrdxh0EXo",
-      authDomain: "nusantaraweaveverse-cbdf2.firebaseapp.com",
-      projectId: "nusantaraweaveverse-cbdf2",
-      storageBucket: "nusantaraweaveverse-cbdf2.firebasestorage.app",
-      messagingSenderId: "304336105559",
-      appId: "1:304336105559:web:018ed8ab9d79924f83f312"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    onAuthStateChanged(auth, (user) => {
-      const session = JSON.parse(localStorage.getItem('nuweav_session') || 'null');
-      
-      // Jika belum login, lempar ke login
-      if (!user && !session) {
-        window.location.replace('../login/');
-        return;
-      }
-
-      // Jika admin mencoba masuk ke checkout, lempar ke dasbor admin
-      if (session && session.role === 'admin') {
-        window.location.replace('../admin/');
-      }
-    });
+  <!-- ✦ Auth Guard (Sync) ✦ -->
+  <script>
+    const session = JSON.parse(localStorage.getItem('nuweav_session') || 'null');
+    if (!session) {
+      window.location.replace('../login/');
+    } else if (session.role === 'admin') {
+      window.location.replace('../admin/');
+    }
   </script>
 </head>
 <body>
@@ -154,10 +130,10 @@
 
   <script src="script.js"></script>
 
-  <!-- Firebase SDK for Orders -->
+  <!-- Firebase SDK for Orders & Auth Guard -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -169,9 +145,19 @@
       appId: "1:304336105559:web:018ed8ab9d79924f83f312"
     };
 
-    const app = initializeApp(firebaseConfig, 'checkout-orders');
+    const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    // ── Auth Guard (Async) ──
+    onAuthStateChanged(auth, (user) => {
+      const session = JSON.parse(localStorage.getItem('nuweav_session') || 'null');
+      if (!user && !session) {
+        window.location.replace('../login/');
+      } else if (session && session.role === 'admin') {
+        window.location.replace('../admin/');
+      }
+    });
 
     // ── Isi nama user dari sesi & handle logout ──
     (function() {
