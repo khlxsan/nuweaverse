@@ -292,10 +292,20 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.style.overflow = menuList.classList.contains('open') ? 'hidden' : '';
     };
 
-    // Close menu when clicking a link
+    // Close menu and smoothly scroll when clicking a link
     const links = menuList.querySelectorAll('.nav-link');
     links.forEach(link => {
-      link.onclick = () => {
+      link.onclick = (e) => {
+        e.preventDefault(); // Mencegah hashtag muncul di URL
+
+        const targetId = link.getAttribute('href');
+        if (targetId && targetId.startsWith('#')) {
+          const targetSection = document.querySelector(targetId);
+          if (targetSection) {
+            targetSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+
         menuBtn.classList.remove('active');
         menuList.classList.remove('open');
         document.body.style.overflow = '';
