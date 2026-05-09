@@ -134,15 +134,16 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyAuU5g5_hVvSGzl7OOhtG_zGcRrdxh0EXo",
-      authDomain: "nusantaraweaveverse-cbdf2.firebaseapp.com",
-      projectId: "nusantaraweaveverse-cbdf2",
-      storageBucket: "nusantaraweaveverse-cbdf2.firebasestorage.app",
-      messagingSenderId: "304336105559",
-      appId: "1:304336105559:web:018ed8ab9d79924f83f312"
+      apiKey: "AIzaSyDhGgZxUNSseZJMVBLuO0XVm7X7eCIoois",
+      authDomain: "nuweav-7e6f7.firebaseapp.com",
+      projectId: "nuweav-7e6f7",
+      storageBucket: "nuweav-7e6f7.firebasestorage.app",
+      messagingSenderId: "901393889265",
+      appId: "1:901393889265:web:d3ca4995c1a74975d47650",
+      measurementId: "G-VD9F5DLNWJ"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -180,6 +181,39 @@
     let pendingWaURL = '';
     let pendingOrderData = {};
 
+    let dynamicProductName = "Sasmita Nusantara";
+    let dynamicProductPrice = "Rp1.050.000";
+
+    // ── Load Product Data ──
+    async function fetchProduct() {
+      try {
+        const prodDoc = await getDoc(doc(db, 'products', 'sasmita'));
+        if (prodDoc.exists()) {
+          const data = prodDoc.data();
+          if (data.nama) {
+            dynamicProductName = data.nama;
+            document.querySelector('.item-name').textContent = data.nama;
+          }
+          if (data.harga) {
+            let formattedHarga = data.harga;
+            const numericVal = parseInt(data.harga.toString().replace(/\D/g, ''), 10);
+            if (!isNaN(numericVal)) {
+              formattedHarga = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(numericVal);
+            }
+            
+            dynamicProductPrice = formattedHarga;
+            document.querySelector('.total-price').textContent = formattedHarga;
+            
+            const paymentDesc = document.querySelector('.payment-desc strong');
+            if (paymentDesc) paymentDesc.textContent = formattedHarga;
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching product:', e);
+      }
+    }
+    fetchProduct();
+
     checkoutForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
@@ -188,8 +222,8 @@
       const alamat = document.getElementById('alamat').value.trim();
       const catatan = document.getElementById('catatan').value.trim();
 
-      const productName = "Sasmita Nusantara";
-      const productPrice = "Rp1.050.000";
+      const productName = dynamicProductName;
+      const productPrice = dynamicProductPrice;
       const adminWA = "6281339499293";
 
       // Susun pesan WhatsApp

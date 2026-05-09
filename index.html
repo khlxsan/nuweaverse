@@ -476,5 +476,59 @@
   <!-- Model-viewer library for 3D rendering -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   <script src="script.js"></script>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDhGgZxUNSseZJMVBLuO0XVm7X7eCIoois",
+      authDomain: "nuweav-7e6f7.firebaseapp.com",
+      projectId: "nuweav-7e6f7",
+      storageBucket: "nuweav-7e6f7.firebasestorage.app",
+      messagingSenderId: "901393889265",
+      appId: "1:901393889265:web:d3ca4995c1a74975d47650",
+      measurementId: "G-VD9F5DLNWJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Fetch product data
+    async function loadProductData() {
+      try {
+        const prodDoc = await getDoc(doc(db, 'products', 'sasmita'));
+        if (prodDoc.exists()) {
+          const data = prodDoc.data();
+          const nama = data.nama;
+          let harga = data.harga;
+
+          if (nama) {
+            const catalogTitle = document.querySelector('.catalog-item.active-item .item-title');
+            if (catalogTitle) catalogTitle.textContent = nama;
+            
+            const modalTitle = document.querySelector('.prod-info-inner .prod-title');
+            if (modalTitle) modalTitle.textContent = nama;
+          }
+
+          if (harga) {
+             // Format angka menjadi Rp (contoh: 1050000 -> Rp1.050.000)
+             const numericVal = parseInt(harga.toString().replace(/\D/g, ''), 10);
+             if (!isNaN(numericVal)) {
+                harga = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(numericVal);
+             }
+
+            const modalPrice = document.querySelector('.prod-price-box .prod-price');
+            if (modalPrice) modalPrice.textContent = harga;
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching product data:", e);
+      }
+    }
+    
+    loadProductData();
+  </script>
 </body>
 </html>
